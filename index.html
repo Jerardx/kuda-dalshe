@@ -192,8 +192,8 @@ function score(arr,pfx){const s={};arr.forEach((q,i)=>{const el=document.querySe
  const v=el?+el.value:0;s[q[1]]=(s[q[1]]||0)+v});return s}
 function pct(s,arr){const c={};arr.forEach(q=>c[q[1]]=(c[q[1]]||0)+1);
  const o={};for(const k in s)o[k]=Math.round(s[k]/(c[k]*5)*100);return o}
-function top(o,n){return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n)}
-function bars(o,names){return top(o,99).map(([k,v])=>
+function topN(o,n){return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n)}
+function bars(o,names){return topN(o,99).map(([k,v])=>
  `<div class="bar"><i style="width:${v}%"></i><b>${names[k]}</b><u>${v}%</u></div>`).join("")}
 
 const DIR={
@@ -215,15 +215,15 @@ const DIR={
 
 function calc(){
  const rs=pct(score(R,"r"),R),ts=pct(score(T,"t"),T),vs=pct(score(V,"v"),V),ws=pct(score(W,"w"),W),ns=pct(score(N,"n"),N);
- const t2=top(rs,2),code=t2.map(x=>x[0]).join("");
+ const t2=topN(rs,2),code=t2.map(x=>x[0]).join("");
  let dirs=DIR[code]||DIR[code.split("").reverse().join("")];
  if(!dirs){const k=Object.keys(DIR).find(x=>x[0]==code[0]);dirs=DIR[k]||["Смешанный профиль — разберём отдельно"]}
- const tt=top(ts,4),tv=top(vs,3),tn=top(ns,2);
+ const tt=topN(ts,4),tv=topN(vs,3),tn=topN(ns,2);
  const solo=ws.solo>ws.team?"глубокая работа в своём темпе, малые группы":"командная и клиентская среда, много контакта";
  const stru=ws.vary>ws.struct?"нужно разнообразие и смена задач — рутинная позиция быстро выжжет":"комфортнее предсказуемый ритм и понятные рамки";
  const rk=ws.risk>=60?"готова к риску — предпринимательский формат реален":"риск лучше дозировать: начинать параллельно, без резких прыжков";
  let open="";Q.forEach((q,i)=>{const a=document.getElementById("q"+i).value.trim();if(a)open+=`<div class="card"><h3>${i+1}. ${q}</h3>${a.replace(/</g,"&lt;")}</div>`});
- let txt=`РЕЗУЛЬТАТ ТЕСТА «КУДА ДАЛЬШЕ»\n\nИНТЕРЕСЫ: ${top(rs,99).map(([k,v])=>NAMES[k]+" "+v+"%").join(", ")}\nКОД: ${code}\nТАЛАНТЫ: ${tt.map(([k,v])=>TN[k]+" "+v+"%").join(", ")}\nЦЕННОСТИ: ${tv.map(([k,v])=>VN[k]+" "+v+"%").join(", ")}\nСТИЛЬ: solo ${ws.solo}%, команда ${ws.team}%, структура ${ws.struct}%, разнообразие ${ws.vary}%, риск ${ws.risk}%\nВЫЖИГАЕТ: ${tn.map(([k,v])=>NN[k]+" "+v+"%").join(", ")}\nНАПРАВЛЕНИЯ: ${dirs.join("; ")}\n\nОТВЕТЫ:\n`;
+ let txt=`РЕЗУЛЬТАТ ТЕСТА «КУДА ДАЛЬШЕ»\n\nИНТЕРЕСЫ: ${topN(rs,99).map(([k,v])=>NAMES[k]+" "+v+"%").join(", ")}\nКОД: ${code}\nТАЛАНТЫ: ${tt.map(([k,v])=>TN[k]+" "+v+"%").join(", ")}\nЦЕННОСТИ: ${tv.map(([k,v])=>VN[k]+" "+v+"%").join(", ")}\nСТИЛЬ: solo ${ws.solo}%, команда ${ws.team}%, структура ${ws.struct}%, разнообразие ${ws.vary}%, риск ${ws.risk}%\nВЫЖИГАЕТ: ${tn.map(([k,v])=>NN[k]+" "+v+"%").join(", ")}\nНАПРАВЛЕНИЯ: ${dirs.join("; ")}\n\nОТВЕТЫ:\n`;
  Q.forEach((q,i)=>{const a=document.getElementById("q"+i).value.trim();if(a)txt+=`${i+1}. ${q}\n— ${a}\n`});
 
  document.getElementById("res").style.display="block";
