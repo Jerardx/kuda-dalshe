@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Профориентационный тест — «Куда дальше»</title>
+<style>
+:root{--pink:#c64a70;--berry:#78283e;--ink:#2c2a28;--soft:#6f6862;--bg:#fffdfb;--card:#fff5f7;--line:#f0dce2;--ok:#3d7a55}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:16px;max-width:760px;margin:0 auto;padding-bottom:80px}
+h1{font-size:23px;margin:.2em 0 .1em;color:var(--berry)}
+.sub{color:var(--soft);font-size:14px;margin:0 0 14px}
+h2{font-size:17px;margin:26px 0 4px;color:var(--pink);border-bottom:2px solid var(--line);padding-bottom:5px}
+.hint{font-size:13px;color:var(--soft);margin:2px 0 10px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:9px 0}
+.qt{font-size:15px;margin-bottom:8px}
+.scale{display:flex;gap:6px;justify-content:space-between}
+.scale label{flex:1;text-align:center;font-size:13px;color:var(--soft);cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 0;transition:.15s;user-select:none}
+.scale input{display:none}
+.scale input:checked + span{color:#fff}
+.scale label:has(input:checked){background:var(--pink);border-color:var(--pink);color:#fff;font-weight:600}
+.legend{display:flex;justify-content:space-between;font-size:11px;color:#a09890;margin-top:4px}
+textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;min-height:70px;background:#fff;color:var(--ink)}
+button{background:var(--pink);color:#fff;border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:14px}
+button.sec{background:#fff;color:var(--pink);border:2px solid var(--pink)}
+.warn{background:#fff7ea;border:1px solid #f0e0c0;border-radius:12px;padding:12px 14px;font-size:14px;color:#6a5a33;margin:10px 0}
+#res{display:none;margin-top:20px}
+.bar{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;height:26px;position:relative;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#e8a0b8,#c64a70)}
+.bar b{position:absolute;left:10px;top:3px;font-size:13px;color:var(--ink);font-weight:600}
+.bar u{position:absolute;right:10px;top:3px;font-size:13px;color:var(--soft);text-decoration:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0}
+.card h3{margin:0 0 6px;font-size:16px;color:var(--berry)}
+ul{margin:6px 0 6px 18px;padding:0}li{margin:4px 0}
+.tag{display:inline-block;background:#fff;border:1px solid var(--line);color:var(--pink);border-radius:20px;padding:3px 11px;font-size:13px;margin:3px 3px 0 0}
+.prog{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 16px;font-size:13px;color:var(--soft);text-align:center}
+.prog i{display:block;height:5px;background:var(--pink);border-radius:3px;margin-bottom:5px;width:0;transition:.2s}
+</style>
+</head>
+<body>
+<h1>🧭 Куда дальше</h1>
+<p class="sub">Глубокая анкета самоопределения: интересы, таланты, ценности, стиль работы и антипаттерны. Без привязки к прошлым местам работы — только про тебя. ~15–20 минут.</p>
+
+<div class="warn">Отвечай честно и про себя <b>сегодняшнюю</b>, а не про то, «как правильно». Оценивай по шкале: <b>1 — совсем не про меня</b>, <b>5 — точно про меня</b>.</div>
+
+<form id="f">
+
+<h2>Блок 1. Интересы — что тянет</h2>
+<p class="hint">Представь, что деньги и мнение окружающих не важны. Насколько тебе это интересно?</p>
+<div id="b1"></div>
+
+<h2>Блок 2. Таланты — что даётся легко</h2>
+<p class="hint">Не «умею», а «получается легче, чем у большинства, и не выжигает».</p>
+<div id="b2"></div>
+
+<h2>Блок 3. Ценности — ради чего работать</h2>
+<p class="hint">Насколько это важно, чтобы работа была «твоей».</p>
+<div id="b3"></div>
+
+<h2>Блок 4. Стиль работы — как тебе комфортно</h2>
+<div id="b4"></div>
+
+<h2>Блок 5. Антипаттерны — что выжигает</h2>
+<p class="hint">Здесь 5 = «это меня реально убивает».</p>
+<div id="b5"></div>
+
+<h2>Блок 6. Вопросы для рефлексии</h2>
+<p class="hint">Отвечай свободно, 1–3 предложения. Эти ответы дают самое ценное — они попадут в итог, который можно переслать мне для разбора.</p>
+<div id="b6"></div>
+
+<button type="button" onclick="calc()">📊 Показать результат</button>
+</form>
+
+<div id="res"></div>
+
+<div class="prog"><i id="pbar"></i><span id="ptxt">0 из 0 отвечено</span></div>
+
+<script>
+const R=[ // [текст, шкала]
+ ["Разбираться, как устроены вещи, и чинить/собирать что-то руками","R"],
+ ["Работать с материалами: ткань, дерево, глина, металл, бусины","R"],
+ ["Видеть физический результат труда в конце дня","R"],
+ ["Копаться в данных, искать причину, почему что-то не работает","I"],
+ ["Изучать новую сложную тему просто из любопытства","I"],
+ ["Разбирать явление на части и строить систему/логику","I"],
+ ["Придумывать образы, дизайн, оформление, эстетику","A"],
+ ["Создавать что-то, чего раньше не существовало","A"],
+ ["Выражать себя через визуал, текст, стиль, творчество","A"],
+ ["Помогать людям решать их проблемы и поддерживать","S"],
+ ["Учить, объяснять, наставлять, вести за собой группу","S"],
+ ["Слушать людей и понимать, что им на самом деле нужно","S"],
+ ["Продавать, убеждать, договариваться, вести переговоры","E"],
+ ["Запускать своё дело, брать риск и отвечать за результат","E"],
+ ["Организовывать людей и процессы, быть главной","E"],
+ ["Наводить порядок: таблицы, учёт, каталоги, регламенты","C"],
+ ["Работать по понятной системе, где всё предсказуемо","C"],
+ ["Доводить детали до идеала, замечать несостыковки","C"]
+];
+const T=[
+ ["Быстро схватываю суть в новой области","learn"],
+ ["Легко учусь новому без чужой помощи","learn"],
+ ["У меня хороший вкус: вижу, что красиво, а что нет","aest"],
+ ["Мне легко придумать идею «как это подать»","aest"],
+ ["Я хорошо чувствую людей и их настроение","people"],
+ ["Со мной легко: умею расположить и договориться","people"],
+ ["Я довожу начатое до конца, даже когда скучно","exec"],
+ ["Я умею планировать и держать много задач","exec"],
+ ["Мне легко объяснять сложное простыми словами","comm"],
+ ["Я хорошо и охотно пишу/говорю на публику","comm"],
+ ["Я замечаю возможности заработать там, где другие не видят","biz"],
+ ["Мне комфортно назначать цену и говорить о деньгах","biz"],
+ ["Я умею собирать хаос в систему и порядок","syst"],
+ ["Мне легко работать с цифрами, учётом, аналитикой","syst"],
+ ["Я устойчива в стрессе и не разваливаюсь от проблем","resil"],
+ ["Я легко переключаюсь и адаптируюсь к переменам","resil"]
+];
+const V=[
+ ["Свобода: сама решаю, что и когда делать","freedom"],
+ ["Гибкий график, возможность подстроить под семью","freedom"],
+ ["Творчество и самовыражение в работе","creat"],
+ ["Красота и эстетика того, что я делаю","creat"],
+ ["Высокий доход и рост заработка","money"],
+ ["Финансовая независимость и подушка безопасности","money"],
+ ["Признание, статус, чтобы меня знали","status"],
+ ["Влияние: мои решения меняют что-то вокруг","status"],
+ ["Польза людям, ощущение смысла","meaning"],
+ ["Развитие: постоянно расти и учиться","growth"],
+ ["Стабильность и предсказуемость завтрашнего дня","stab"],
+ ["Спокойствие: работа не должна съедать жизнь","stab"]
+];
+const W=[
+ ["Мне лучше работать одной, чем в команде","solo"],
+ ["Я предпочитаю глубокую работу без дёрганий","solo"],
+ ["Мне нужен постоянный контакт с людьми, иначе скучно","team"],
+ ["Я заряжаюсь от общения и обсуждений","team"],
+ ["Мне комфортнее, когда есть чёткие правила и рамки","struct"],
+ ["Люблю стабильный ритм без резких скачков","struct"],
+ ["Мне нравится, когда каждый день разный","vary"],
+ ["Я быстро скучаю от рутины","vary"],
+ ["Я готова рисковать ради большего результата","risk"],
+ ["Я легко принимаю решения при неполной информации","risk"]
+];
+const N=[
+ ["Долгая монотонная рутина без смысла","rout"],
+ ["Жёсткий контроль и когда стоят над душой","ctrl"],
+ ["Формальная отчётность и бюрократия","rout"],
+ ["Конфликты и агрессивная среда","conf"],
+ ["Публичные выступления и внимание толпы","expo"],
+ ["Много общения с незнакомыми людьми подряд","expo"],
+ ["Работа без чёткого результата, «в стол»","conf"],
+ ["Постоянный аврал и дедлайны","ctrl"]
+];
+const Q=[
+ "Что ты делала за последний год, когда время пролетало незаметно?",
+ "За что тебя чаще всего благодарят или хвалят — своими словами?",
+ "К тебе приходят за советом — в чём именно?",
+ "Что бы ты делала, если бы деньги были не нужны, но нельзя сидеть без дела?",
+ "Какое дело ты бросила, но до сих пор жалеешь?",
+ "Что в работе тебя выжигает быстрее всего?",
+ "Опиши идеальный рабочий день: где, с кем, что делаешь, во сколько встаёшь?",
+ "Каким навыком ты хотела бы владеть, но пока «не решаешься»?",
+ "Сколько ты хочешь зарабатывать через 2 года и на что эти деньги?",
+ "Чем ты готова заниматься 5 лет подряд, даже если сначала будет мало денег?",
+ "Кому ты завидуешь (по-хорошему) и чему именно в их деле?",
+ "Что тебе мешает начать прямо сейчас — честно?"
+];
+const NAMES={R:"Практик · руками",I:"Исследователь · логика",A:"Творец · эстетика",S:"Человек · помощь",E:"Предприниматель · влияние",C:"Систематизатор · порядок"};
+const TN={learn:"Быстрое обучение",aest:"Вкус и эстетика",people:"Понимание людей",exec:"Доведение до конца",comm:"Коммуникация",biz:"Коммерческое чутьё",syst:"Системность",resil:"Устойчивость"};
+const VN={freedom:"Свобода и гибкость",creat:"Творчество и красота",money:"Деньги и независимость",status:"Признание и влияние",meaning:"Смысл и польза",growth:"Развитие",stab:"Стабильность и покой"};
+const NN={rout:"Рутина и бюрократия",ctrl:"Контроль и авралы",conf:"Конфликты и работа «в стол»",expo:"Публичность и поток незнакомцев"};
+
+function render(id,arr,pfx){
+ document.getElementById(id).innerHTML=arr.map((q,i)=>
+ `<div class="q"><div class="qt">${q[0]}</div><div class="scale">${[1,2,3,4,5].map(v=>
+ `<label><input type="radio" name="${pfx}${i}" value="${v}" onchange="prog()"><span>${v}</span></label>`).join("")}</div>
+ <div class="legend"><span>не про меня</span><span>точно про меня</span></div></div>`).join("");
+}
+render("b1",R,"r");render("b2",T,"t");render("b3",V,"v");render("b4",W,"w");render("b5",N,"n");
+document.getElementById("b6").innerHTML=Q.map((q,i)=>
+ `<div class="q"><div class="qt">${i+1}. ${q}</div><textarea id="q${i}" oninput="prog()"></textarea></div>`).join("");
+
+const TOTAL=R.length+T.length+V.length+W.length+N.length+Q.length;
+function prog(){
+ let n=document.querySelectorAll('input[type=radio]:checked').length;
+ Q.forEach((_,i)=>{if(document.getElementById("q"+i).value.trim())n++});
+ document.getElementById("ptxt").textContent=n+" из "+TOTAL+" отвечено";
+ document.getElementById("pbar").style.width=(n/TOTAL*100)+"%";
+}
+prog();
+
+function score(arr,pfx){const s={};arr.forEach((q,i)=>{const el=document.querySelector(`input[name=${pfx}${i}]:checked`);
+ const v=el?+el.value:0;s[q[1]]=(s[q[1]]||0)+v});return s}
+function pct(s,arr){const c={};arr.forEach(q=>c[q[1]]=(c[q[1]]||0)+1);
+ const o={};for(const k in s)o[k]=Math.round(s[k]/(c[k]*5)*100);return o}
+function top(o,n){return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n)}
+function bars(o,names){return top(o,99).map(([k,v])=>
+ `<div class="bar"><i style="width:${v}%"></i><b>${names[k]}</b><u>${v}%</u></div>`).join("")}
+
+const DIR={
+ AE:["Свой бренд/продукт с сильной эстетикой","Дизайн и визуал на заказ","Контент-креатор, продвижение красивых ниш","Байер / стилист / декоратор"],
+ AS:["Преподавание творчества, мастер-классы","Арт-терапия, творческие клубы","Дизайн для людей: интерьеры, образы","Контент про людей и заботу"],
+ AR:["Хендмейд как производство: масштабирование","Прикладной дизайн предметов","Флористика, декор, оформление пространств","Реставрация, авторская мебель/керамика"],
+ EA:["Создание и продвижение бренда","Маркетинг креативных продуктов","Продюсирование чужих талантов","Организация мероприятий/маркетов"],
+ ES:["Обучение и наставничество, свои курсы","Продажи через отношения, клиентский сервис","HR/подбор, ведение команды","Комьюнити-менеджмент"],
+ EI:["Аналитика для бизнеса, консалтинг","Продуктовый менеджмент","Инвестиции/финансы","Запуск нишевого сервиса на данных"],
+ EC:["Операционное управление, наведение порядка в бизнесе","Логистика, закупки, поставки","Управление маркетплейс-магазином","Финансовый учёт для малого бизнеса"],
+ SI:["Психология, коучинг, консультирование","Нутрициология/здоровье","Методология обучения","Исследования про людей (UX, соцопросы)"],
+ SA:["Преподавание, работа с детьми","Контент-блогинг с заботой","Ивенты и праздники","Терапевтические практики"],
+ IC:["Аналитика данных, отчётность","Тестирование, качество","Автоматизация процессов","Бухгалтерия/финмодели"],
+ IA:["UX/продуктовый дизайн","Исследование трендов","Копирайтинг, редактура","Диджитал-профессии на стыке логики и вкуса"],
+ CR:["Учёт и складские процессы","Администрирование, координация","Каталогизация, работа с ассортиментом","Документооборот"],
+ RS:["Мастер-практик с клиентами (руками)","Бьюти/уход/массаж","Кулинария и производство еды","Ремесленное дело с обучением"],
+ RI:["Техническая профессия, ремонт, наладка","Агро/садоводство","Прикладные технологии","Производство и качество"]
+};
+
+function calc(){
+ const rs=pct(score(R,"r"),R),ts=pct(score(T,"t"),T),vs=pct(score(V,"v"),V),ws=pct(score(W,"w"),W),ns=pct(score(N,"n"),N);
+ const t2=top(rs,2),code=t2.map(x=>x[0]).join("");
+ let dirs=DIR[code]||DIR[code.split("").reverse().join("")];
+ if(!dirs){const k=Object.keys(DIR).find(x=>x[0]==code[0]);dirs=DIR[k]||["Смешанный профиль — разберём отдельно"]}
+ const tt=top(ts,4),tv=top(vs,3),tn=top(ns,2);
+ const solo=ws.solo>ws.team?"глубокая работа в своём темпе, малые группы":"командная и клиентская среда, много контакта";
+ const stru=ws.vary>ws.struct?"нужно разнообразие и смена задач — рутинная позиция быстро выжжет":"комфортнее предсказуемый ритм и понятные рамки";
+ const rk=ws.risk>=60?"готова к риску — предпринимательский формат реален":"риск лучше дозировать: начинать параллельно, без резких прыжков";
+ let open="";Q.forEach((q,i)=>{const a=document.getElementById("q"+i).value.trim();if(a)open+=`<div class="card"><h3>${i+1}. ${q}</h3>${a.replace(/</g,"&lt;")}</div>`});
+ let txt=`РЕЗУЛЬТАТ ТЕСТА «КУДА ДАЛЬШЕ»\n\nИНТЕРЕСЫ: ${top(rs,99).map(([k,v])=>NAMES[k]+" "+v+"%").join(", ")}\nКОД: ${code}\nТАЛАНТЫ: ${tt.map(([k,v])=>TN[k]+" "+v+"%").join(", ")}\nЦЕННОСТИ: ${tv.map(([k,v])=>VN[k]+" "+v+"%").join(", ")}\nСТИЛЬ: solo ${ws.solo}%, команда ${ws.team}%, структура ${ws.struct}%, разнообразие ${ws.vary}%, риск ${ws.risk}%\nВЫЖИГАЕТ: ${tn.map(([k,v])=>NN[k]+" "+v+"%").join(", ")}\nНАПРАВЛЕНИЯ: ${dirs.join("; ")}\n\nОТВЕТЫ:\n`;
+ Q.forEach((q,i)=>{const a=document.getElementById("q"+i).value.trim();if(a)txt+=`${i+1}. ${q}\n— ${a}\n`});
+
+ document.getElementById("res").style.display="block";
+ document.getElementById("res").innerHTML=`
+ <h2>🎯 Твой профиль</h2>
+ <div class="card"><h3>Интересы</h3>${bars(rs,NAMES)}
+ <p style="font-size:14px;color:var(--soft);margin:8px 0 0">Твой код: <b style="color:var(--pink)">${code}</b> — ${NAMES[t2[0][0]]} + ${NAMES[t2[1][0]]}</p></div>
+ <div class="card"><h3>Сильные стороны</h3>${bars(ts,TN)}</div>
+ <div class="card"><h3>Ценности — топ-3</h3>${tv.map(([k,v])=>`<span class="tag">${VN[k]} · ${v}%</span>`).join("")}
+ <p style="font-size:14px;margin:8px 0 0">Работа, которая не бьётся с этими тремя пунктами, будет тихо тебя разрушать — даже если «хорошая».</p></div>
+ <div class="card"><h3>Как тебе работать</h3><ul><li>Формат: <b>${solo}</b></li><li>Ритм: <b>${stru}</b></li><li>Риск: <b>${rk}</b></li></ul></div>
+ <div class="card"><h3>Чего избегать</h3>${tn.map(([k,v])=>`<span class="tag">${NN[k]} · ${v}%</span>`).join("")}
+ <p style="font-size:14px;margin:8px 0 0">Это твои слабые места не как «недостатки», а как среда, в которой ты не выживешь долго. Проверяй любую идею на них.</p></div>
+ <div class="card" style="background:#eef7f0;border-color:#d6ead9"><h3 style="color:#2f6b47">Куда смотреть — гипотезы</h3><ul>${dirs.map(d=>`<li>${d}</li>`).join("")}</ul>
+ <p style="font-size:14px;margin:6px 0 0">Это не приговор, а список для проверки. Возьми 2–3 и протестируй маленьким шагом (пробный проект, 1 клиент, 2 недели).</p></div>
+ ${open?`<h2>✍️ Твои ответы</h2>${open}`:""}
+ <button class="sec" onclick="cp()">📋 Скопировать результат — отправить Родриго на разбор</button>
+ <textarea id="raw" style="position:absolute;left:-9999px">${txt.replace(/</g,"&lt;")}</textarea>`;
+ window.__t=txt;
+ document.getElementById("res").scrollIntoView({behavior:"smooth"});
+}
+function cp(){navigator.clipboard.writeText(window.__t).then(()=>alert("Скопировано! Вставь в чат Родриго — сделаю персональный разбор."),
+ ()=>{const t=document.getElementById("raw");t.style.position="static";t.select();alert("Выдели текст ниже и скопируй вручную")})}
+</script>
+</body>
+</html>
